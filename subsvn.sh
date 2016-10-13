@@ -96,50 +96,6 @@ case $COMMAND in
         echo "Switching to "$ROOT$TARGET
         svn sw $ROOT$TARGET
     ;;
-    *_from_*)
-        SOURCE_NAME=$1
-        TARGET_NAME=$2
-
-        OPERATION=${COMMAND%%_from_*}
-        SOURCE_TYPE=${COMMAND##*_from_}
-        echo "OPERATION="$OPERATION
-        echo "SOURCE="$SOURCE
-        case $OPERATION in
-            branch)
-                TARGET_PATH=$BRANCH_MARKER$TARGET_NAME
-            ;;
-            tag)
-                TARGET_PATH=$TAG_MARKER$TARGET_NAME
-            ;;
-            *)
-                echo "Unknown operation "$OPERATION
-                exit 1
-            ;;
-        esac
-        case $SOURCE_TYPE in
-            trunk)
-                SOURCE_PATH="/trunk"
-            ;;
-            branch)
-                SOURCE_PATH=$BRANCH_MARKER$SOURCE_NAME
-            ;;
-            tag)
-                SOURCE_PATH=$TAG_MARKER$SOURCE_NAME
-            ;;
-            *)
-                echo "Unknown source "$SOURCE_TYPE
-                exit 1
-            ;;
-        esac
-        echo "Creating $OPERATION with name $TARGET_NAME"
-        svn cp $ROOT$SOURCE_PATH $ROOT$TARGET_PATH
-
-        if [ "x$OPERATION" = "xbranch" ]
-        then
-            echo "Switching working copy to $OPERATION $TARGET_NAME"
-            svn sw $ROOT$TARGET_PATH
-        fi
-    ;;
     ls-*)
         SOURCE=${COMMAND##ls-}
         case $SOURCE in
@@ -185,18 +141,6 @@ case $COMMAND in
         echo "                          Accepts target branch name as argument."
         echo " tag                  )   Create tag from current working copy path."
         echo "                          Accepts target tag name as argument."
-        echo " tag_from_tag         )   Create new tag from target tag."
-        echo "                          Accepts target tag as FIRST argument and new tag name as SECOND argument."
-        echo " tag_from_branch      )   Create new tag from target branch."
-        echo "                          Accepts target branch as FIRST argument and new tag name as SECOND argument."
-        echo " tag_from_trunk       )   Create new tag from trunk."
-        echo "                          Accepts new tag name as argument."
-        echo " branch_from_tag      )   Create new branch from target tag and switch to it."
-        echo "                          Accepts target tag as FIRST argument and new branch name as SECOND argument."
-        echo " branch_from_branch   )   Create new branch from target branch and switch to it."
-        echo "                          Accepts target branch as FIRST argument and new branch name as SECOND argument."
-        echo " branch_from_trunk    )   Create new branch from trunk and switch to it."
-        echo "                          Accepts new branch name as argument."
         echo " sw|switch            )   Switch working copy to target branch or trunk."
         echo "                          Accepts target branch name or trunk as argument."
         echo " sw_to_branch             "
