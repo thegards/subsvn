@@ -1,6 +1,7 @@
-#!/usr/bin/bash
+#!/bin/bash
+SUBSVN_CMD=${SUBSVN_CMD:-svn}
 
-CURRENT=`svn info | grep "Relative" | sed 's/Relative URL: //g'`
+CURRENT=`$SUBSVN_CMD info | grep "Relative" | sed 's/Relative URL: //g'`
 BRANCH_FOLDER="branches"
 BRANCH_PREFIX="$BRANCH_FOLDER/"
 BRANCH_MARKER="/$BRANCH_FOLDER/"
@@ -39,6 +40,9 @@ COMMAND=$1
 shift
 
 case $COMMAND in
+    diff|status|st|info|cleanup|revert|resolve)
+        $SUBSVN_CMD $COMMAND $1 $2 $3 $4 $5 $6 $7 $8 $9
+    ;;
     log|merge)
         SOURCE=$1
         shift
@@ -50,30 +54,30 @@ case $COMMAND in
             SOURCE_PATH=$BRANCH_MARKER$SOURCE
         fi
 
-        svn $COMMAND $ROOT$SOURCE_PATH $1 $2 $3 $4 $5 $6 $7 $8 $9
+        $SUBSVN_CMD $COMMAND $ROOT$SOURCE_PATH $1 $2 $3 $4 $5 $6 $7 $8 $9
     ;;
     branch)
         BRANCH_NAME=$1
         echo "Creating branch $BRANCH_NAME from $CURRENT_NAME"
-        svn cp $CURRENT $ROOT$BRANCH_MARKER$BRANCH_NAME
+        $SUBSVN_CMD cp $CURRENT $ROOT$BRANCH_MARKER$BRANCH_NAME
 
         echo "Switching working copy to branch $BRANCH_NAME"
-        svn sw $ROOT$BRANCH_MARKER$BRANCH_NAME
+        $SUBSVN_CMD sw $ROOT$BRANCH_MARKER$BRANCH_NAME
     ;;
     tag)
         TAG_NAME=$1
         echo "Creating tag $TAG_NAME from $CURRENT_NAME"
-        svn cp $CURRENT $ROOT$TAG_MARKER$TAG_NAME
+        $SUBSVN_CMD cp $CURRENT $ROOT$TAG_MARKER$TAG_NAME
     ;;
     sw|switch)
         BRANCH_NAME=$1
         if [ "x$BRANCH_NAME" = "xtrunk" ]
         then
             echo "Switching working copy to $BRANCH_NAME"
-            svn sw $ROOT"/"$BRANCH_NAME
+            $SUBSVN_CMD sw $ROOT"/"$BRANCH_NAME
         else
             echo "Switching working copy to branch $BRANCH_NAME"
-            svn sw $ROOT$BRANCH_MARKER$BRANCH_NAME
+            $SUBSVN_CMD sw $ROOT$BRANCH_MARKER$BRANCH_NAME
         fi
     ;;
     switch_to_*|sw_to_*)
@@ -94,7 +98,7 @@ case $COMMAND in
             ;;
         esac
         echo "Switching to "$ROOT$TARGET
-        svn sw $ROOT$TARGET
+        $SUBSVN_CMD sw $ROOT$TARGET
     ;;
     ls-*)
         SOURCE=${COMMAND##ls-}
@@ -110,7 +114,7 @@ case $COMMAND in
                 exit 1
             ;;
         esac
-        svn ls $ROOT$TARGET_DIR
+        $SUBSVN_CMD ls $ROOT$TARGET_DIR
     ;;
     pristine)
         echo "WARNING: THIS WILL REVERT ALL CHANGES AND REMOVE UNVERSIONED AND IGNORED FILES FROM YOUR WORKING COPY."
@@ -118,9 +122,9 @@ case $COMMAND in
         read
 
         echo "Reverting modifications..."
-        svn revert -R .
+        $SUBSVN_CMD revert -R .
         echo "Removing unversioned and ignored files..."
-        svn st --no-ignore | cut -c 9- | sed 's/\\/\//g' | xargs -I{} rm -rf "{}"
+        $SUBSVN_CMD st --no-ignore | cut -c 9- | sed 's/\\/\//g' | xargs -I{} rm -rf "{}"
     ;;
     *)
         if [ "x$COMMAND" != "xhelp" ]
