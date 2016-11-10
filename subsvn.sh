@@ -40,7 +40,7 @@ COMMAND=$1
 shift
 
 case $COMMAND in
-    diff|status|st|info|cleanup|revert|resolve)
+    up|update|diff|status|st|info|cleanup|revert|resolve)
         $SUBSVN_CMD $COMMAND $1 $2 $3 $4 $5 $6 $7 $8 $9
     ;;
     log|merge)
