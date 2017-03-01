@@ -124,7 +124,7 @@ case $COMMAND in
         echo "Reverting modifications..."
         $SUBSVN_CMD revert -R .
         echo "Removing unversioned and ignored files..."
-        $SUBSVN_CMD st --no-ignore | cut -c 9- | sed 's/\\/\//g' | xargs -I{} rm -rf "{}"
+        $SUBSVN_CMD st --no-ignore | cut -c 9- | grep "^(?|I)" | sed 's/\\/\//g' | xargs -I{} rm -rf "{}"
     ;;
     *)
         if [ "x$COMMAND" != "xhelp" ]
